@@ -24,22 +24,22 @@
     const flagSrc = 'https://global-cdn.regatta.com/assets/icon-pack/flags/uk.svg';
 
     const lightboxHTML = `
-    <div id="locationLightbox">
-      <div class="locationContainer">
-        <div id="closeLocationBox" class="closeLocationBox">X</div>
-        <div class="locationTitle"> Sorry, we don't ship to your location! </div>
-        <div class="locationSubtitle">We do not ship to your location from our ${sitelocation} site. Please visit our ${userLanguage} site to place an order.</div>
-    
-        <div class="locationFlags">
-          <a href="${redirectUrl}">
-            <img src="${flagSrc}">
-            <div>Continue to our ${siteName} ${userLocation} Site &gt;</div>
-          </a>
+      <div id="locationLightbox">
+        <div class="locationContainer">
+          <div id="closeLocationBox" class="closeLocationBox">X</div>
+          <div class="locationTitle"> Sorry, we don't ship to your location! </div>
+          <div class="locationSubtitle">We do not ship to your location from our ${sitelocation} site. Please visit our ${userLanguage} site to place an order.</div>
+      
+          <div class="locationFlags">
+            <a href="${redirectUrl}">
+              <img src="${flagSrc}">
+              <div>Continue to our ${siteName} ${userLocation} Site &gt;</div>
+            </a>
+          </div>
+          <div>Or</div>
+          <a class="closeLocationBox">Or continue browsing this site</a>
         </div>
-        <div>Or</div>
-        <a class="closeLocationBox">Or continue browsing this site</a>
       </div>
-    </div>
     `;
 
     // Insert HTML
@@ -54,7 +54,6 @@
         sessionStorage.setItem('locationLightboxSeen', 'true');
       });
     });
-
   } catch (error) {
     console.error(error);
   }
