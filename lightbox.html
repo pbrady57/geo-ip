@@ -171,7 +171,7 @@
         if (userIp && locationLightboxSeen !== 'true') {
           try {
             // Find user location from ip
-            const res = await fetch('http://localhost:5000/' + userIp);
+            const res = await fetch('https://geo-ip-regatta.herokuapp.com/' + userIp);
             const data = await res.json();
             const country = data.country;
 
