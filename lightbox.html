@@ -157,7 +157,7 @@
   const sessionStorage = window.sessionStorage;
   const locationLightboxSeen = sessionStorage.getItem('locationLightboxSeen');
 
-  const updateAndShowLightbox = (lang, country, url) => {
+  function updateAndShowLightbox(lang, country, url) {
     document.getElementById('lightboxUserLanguage').innerText = lang;
     document.getElementById('lightboxUserCountry').innerText = country;
     document.getElementById('lightboxRedirectUrl').href = url;
@@ -183,7 +183,6 @@
             if (country === 'IE' && !(document.documentElement.lang === 'en-IE' || html.classList.contains('RCIE'))) {
               updateAndShowLightbox('Irish', 'Ireland', 'https://www.regatta.ie/');
             }
-
           } catch (error) {
             console.error(error);
           }
