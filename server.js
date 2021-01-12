@@ -1,16 +1,15 @@
 const geoip = require('geoip-lite');
-const publicIp = require('public-ip');
 const cors = require('cors');
 const express = require('express');
 
 const app = express();
 app.use('*', cors());
+app.use(express.json({ limit: '10kb' }));
 
-app.get('/', async (req, res) => {
+app.get('/:ip', async (req, res) => {
   try {
-    const geo = geoip.lookup(await publicIp.v4());
-    console.log(geo);
-    res.status(200).json({ geo });
+    const { country } = geoip.lookup(req.params.ip);
+    res.status(200).json({ country });
   } catch (error) {
     console.error(error);
   }

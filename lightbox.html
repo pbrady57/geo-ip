@@ -1,2 +1,194 @@
-<link rel="stylesheet" type="text/css" href="styles.css" media="screen" />
-<script src="lightbox.js"></script>
+<style>
+  .locationContainer {
+    text-align: center;
+    min-height: 240px;
+    max-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    box-shadow: 0px 0px 80px rgba(0, 0, 0, 0.6);
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    z-index: 10;
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .locationContainer * {
+    font-family: 'Nunito', helvetica, serif !important;
+  }
+
+  .locationTitle {
+    font-size: 32px;
+    line-height: 1.3em;
+  }
+
+  .locationSubtitle {
+    font-size: 18px;
+  }
+
+  .locationFlags {
+    margin-top: 10px;
+  }
+
+  .locationFlags a {
+    display: inline-block;
+    text-align: center;
+    padding: 10px;
+    text-decoration: none;
+    outline: none;
+    color: #5f5f5e !important;
+  }
+
+  .locationFlags img {
+    width: 100%;
+    max-width: 100px;
+  }
+
+  .locationFlags div {
+    margin-top: 10px;
+    font-weight: bold;
+  }
+
+  #closeLocationBox {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 18px;
+    width: 40px;
+    height: 40px;
+    border: solid 1.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1000px;
+  }
+
+  .closeLocationBox {
+    cursor: pointer;
+  }
+
+  .locationFlags+div+a {
+    font-size: 16px;
+    padding: 10px;
+    display: block;
+  }
+
+  @media only screen and (max-width: 600px) {
+    .locationContainer {
+      min-height: 100%;
+      padding-top: 60px;
+      display: block;
+    }
+
+    .locationTitle {
+      font-size: 8vw;
+    }
+
+    .locationSubtitle {
+      font-size: 5vw;
+    }
+
+    .locationFlags {
+      display: block;
+      overflow: auto;
+      white-space: nowrap;
+    }
+
+    .locationFlags a {
+      display: inline-block;
+      max-width: calc(63.333% - 6px);
+    }
+
+    .locationFlags::-webkit-scrollbar {
+      height: 5px;
+    }
+
+    /* Track */
+    .locationFlags::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    /* Handle */
+    .locationFlags::-webkit-scrollbar-thumb {
+      background: #888;
+    }
+
+    /* Handle on hover */
+    .locationFlags::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+  }
+</style>
+
+<div id="locationLightbox" style="display:none;">
+  <div class="locationContainer">
+    <div id="closeLocationBox" class="closeLocationBox">X</div>
+    <div class="locationTitle"> Sorry, we don't ship to your location! </div>
+    <div class="locationSubtitle">We do not ship to your location from our UK site. Please visit our <span id="lightboxUserLanguage">&nbsp;</span> site to place an order.</div>
+    <div class="locationFlags">
+      <a id="lightboxRedirectUrl" href="https://www.regatta.com">
+        <img src="https://global-cdn.regatta.com/assets/icon-pack/flags/uk.svg">
+        <div>Continue to our Regatta <span id="lightboxUserCountry">&nbsp;</span> Site &gt;</div>
+      </a>
+    </div>
+    <div>Or</div>
+    <a class="closeLocationBox">Or continue browsing this site</a>
+  </div>
+</div>
+
+<script>
+  //  Close lightbox on clicking cross or continue browsing site
+  const closeElements = document.querySelectorAll('.closeLocationBox');
+  [...closeElements].forEach(el => {
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      document.getElementById('locationLightbox').style.display = 'none';
+      sessionStorage.setItem('locationLightboxSeen', 'true');
+    });
+  });
+
+  // Check session storage
+  const sessionStorage = window.sessionStorage;
+  const locationLightboxSeen = sessionStorage.getItem('locationLightboxSeen');
+
+  const updateAndShowLightbox = (lang, country, url) => {
+    document.getElementById('lightboxUserLanguage').innerText = lang;
+    document.getElementById('lightboxUserCountry').innerText = country;
+    document.getElementById('lightboxRedirectUrl').href = url;
+    document.getElementById('locationLightbox').style.display = 'block';
+  };
+
+  window.addEventListener(
+    'message',
+    async e => {
+        const userIp = e.data;
+        if (userIp && locationLightboxSeen !== 'true') {
+          try {
+            // Find user location from ip
+            const res = await fetch('http://localhost:5000/' + userIp);
+            const data = await res.json();
+            const country = data.country;
+
+            // TODO Add more countries & test
+            if (country === 'UK' && document.documentElement.lang !== 'en') {
+              updateAndShowLightbox('UK', 'UK', 'https://www.regatta.com/');
+            }
+
+            if (country === 'IE' && !(document.documentElement.lang === 'en-IE' || html.classList.contains('RCIE'))) {
+              updateAndShowLightbox('Irish', 'Ireland', 'https://www.regatta.ie/');
+            }
+
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      },
+      false,
+  );
+</script>
