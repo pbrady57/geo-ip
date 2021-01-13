@@ -140,6 +140,7 @@
     <div>Or</div>
     <a class="closeLocationBox">Or continue browsing this site</a>
   </div>
+  <iframe src="https://global.regatta.com/configuration/js/get-ip.js"></iframe>
 </div>
 
 <script>
@@ -182,6 +183,10 @@
 
             if (country === 'IE' && !(document.documentElement.lang === 'en-IE' || html.classList.contains('RCIE'))) {
               updateAndShowLightbox('Irish', 'Ireland', 'https://www.regatta.ie/');
+            }
+
+            if (country === 'FR' && !(document.documentElement.lang === 'en-IE' || html.classList.contains('RCIE'))) {
+              updateAndShowLightbox('French', 'France', 'https://www.regatta.com/fr/');
             }
           } catch (error) {
             console.error(error);
