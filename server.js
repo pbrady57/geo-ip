@@ -8,9 +8,7 @@ app.use(express.json({ limit: '10kb' }));
 
 app.get('/', async (req, res) => {
   try {
-    console.log(req.socket.remoteAddress);
-    // console.log(req.connection.remoteAddress);
-    res.send('<h1>Hello World!</h1>');
+    res.send(`<h1>${req.socket.remoteAddress}</h1>`);
   } catch (error) {
     console.error(error);
   }
