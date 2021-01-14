@@ -10,21 +10,12 @@ app.use(express.json({ limit: '10kb' }));
 app.get('/', async (req, res) => {
   try {
     const clientIp = requestIp.getClientIp(req);
-    const country = geoip.lookup(clientIp);
-    res.status(200).json(country);
+    const data = geoip.lookup(clientIp);
+    res.status(200).json(data);
   } catch (error) {
     console.error(error);
   }
 });
-
-// app.get('/:ip', async (req, res) => {
-//   try {
-//     const { country } = geoip.lookup(req.params.ip);
-//     res.status(200).json({ country });
-//   } catch (error) {
-//     console.error(error);
-//   }
-// });
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`Server running on port ${port}...`));

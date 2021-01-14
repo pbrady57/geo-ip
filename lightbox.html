@@ -6,7 +6,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 20px;
+    padding: 30px;
     box-shadow: 0px 0px 80px rgba(0, 0, 0, 0.6);
     position: fixed;
     left: 0;
@@ -32,10 +32,6 @@
     font-size: 18px;
   }
 
-  .locationFlags {
-    margin-top: 10px;
-  }
-
   .locationFlags a {
     display: inline-block;
     text-align: center;
@@ -48,6 +44,7 @@
   .locationFlags img {
     width: 100%;
     max-width: 100px;
+    margin: 10px 10px 20px;
   }
 
   .locationFlags div {
@@ -127,72 +124,57 @@
 </style>
 
 <div id="locationLightbox" style="display:none;">
-  <div class="locationContainer">
-    <div id="closeLocationBox" class="closeLocationBox">X</div>
-    <div class="locationTitle"> Sorry, we don't ship to your location! </div>
-    <div class="locationSubtitle">We do not ship to your location from our UK site. Please visit our <span id="lightboxUserLanguage">&nbsp;</span> site to place an order.</div>
-    <div class="locationFlags">
-      <a id="lightboxRedirectUrl" href="https://www.regatta.com">
-        <img src="https://global-cdn.regatta.com/assets/icon-pack/flags/uk.svg">
-        <div>Continue to our Regatta <span id="lightboxUserCountry">&nbsp;</span> Site &gt;</div>
-      </a>
-    </div>
-    <div>Or</div>
-    <a class="closeLocationBox">Or continue browsing this site</a>
-  </div>
-  <iframe src="https://global.regatta.com/configuration/js/get-ip.js"></iframe>
+  &nbsp;
 </div>
 
 <script>
-  //  Close lightbox on clicking cross or continue browsing site
-  const closeElements = document.querySelectorAll('.closeLocationBox');
-  [...closeElements].forEach(el => {
-    el.addEventListener('click', e => {
-      e.preventDefault();
-      document.getElementById('locationLightbox').style.display = 'none';
-      sessionStorage.setItem('locationLightboxSeen', 'true');
-    });
-  });
-
-  // Check session storage
   const sessionStorage = window.sessionStorage;
   const locationLightboxSeen = sessionStorage.getItem('locationLightboxSeen');
 
-  function updateAndShowLightbox(lang, country, url) {
-    document.getElementById('lightboxUserLanguage').innerText = lang;
-    document.getElementById('lightboxUserCountry').innerText = country;
-    document.getElementById('lightboxRedirectUrl').href = url;
-    document.getElementById('locationLightbox').style.display = 'block';
-  };
+  if (locationLightboxSeen !== 'true') {
+    (async () => {
+      try {
+        const geoRes = await fetch('https://geo-ip-regatta.herokuapp.com/');
+        const geoData = await geoRes.json();
+        const country = geoData.country;
 
-  window.addEventListener(
-    'message',
-    async e => {
-        const userIp = e.data;
-        if (userIp && locationLightboxSeen !== 'true') {
-          try {
-            // Find user location from ip
-            const res = await fetch('https://geo-ip-regatta.herokuapp.com/' + userIp);
-            const data = await res.json();
-            const country = data.country;
+        if (country !== 'GB') {
+          const jsonRes = await fetch('regattaData.json');
+          const allData = await jsonRes.json();
+          const contentData = allData[country];
+          
+          const contentsHTML = `
+            <div class="locationContainer">
+              <div id="closeLocationBox" class="closeLocationBox">X</div>
+              <div class="locationTitle">${contentData.title}</div>
+              <div class="locationSubtitle">${contentData.subtitle}</div>
+              <div class="locationFlags">
+                <a href="${contentData.redirectLink}">
+                  <img src="${contentData.flagSrc}">
+                  <div>${contentData.flagText}</div>
+                </a>
+              </div>
+              <div>Or</div>
+              <a class="closeLocationBox">${contentData.closeText}</a>
+            </div>
+          `
+          const lightBoxEl = document.getElementById('locationLightbox');
+          lightBoxEl.innerHTML = contentsHTML;
+          lightBoxEl.style.display = 'block';
 
-            // TODO Add more countries & test
-            if (country === 'UK' && document.documentElement.lang !== 'en') {
-              updateAndShowLightbox('UK', 'UK', 'https://www.regatta.com/');
-            }
-
-            if (country === 'IE' && !(document.documentElement.lang === 'en-IE' || html.classList.contains('RCIE'))) {
-              updateAndShowLightbox('Irish', 'Ireland', 'https://www.regatta.ie/');
-            }
-
-            if (country === 'FR' && !(document.documentElement.lang === 'en-IE' || html.classList.contains('RCIE'))) {
-              updateAndShowLightbox('French', 'France', 'https://www.regatta.com/fr/');
-            }
-          } catch (error) {
-            console.error(error);
-          }
+          //  Close lightbox on clicking cross or continue browsing site
+          const closeElements = document.querySelectorAll('.closeLocationBox');
+          [...closeElements].forEach(el => {
+            el.addEventListener('click', e => {
+              e.preventDefault();
+              document.getElementById('locationLightbox').style.display = 'none';
+              sessionStorage.setItem('locationLightboxSeen', 'true');
+            });
+          });
         }
-      },
-      false,
-  );
+      } catch (error) {
+        console.error(error);
+      }
+    })()
+  }
 </script>
