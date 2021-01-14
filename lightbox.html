@@ -138,8 +138,9 @@
         const geoData = await geoRes.json();
         const country = geoData.country;
 
+
         if (country !== 'GB') {
-          const jsonRes = await fetch('regattaData.json');
+          const jsonRes = await fetch('data.json');
           const allData = await jsonRes.json();
           const contentData = allData[country];
           
@@ -158,6 +159,7 @@
               <a class="closeLocationBox">${contentData.closeText}</a>
             </div>
           `
+          
           const lightBoxEl = document.getElementById('locationLightbox');
           lightBoxEl.innerHTML = contentsHTML;
           lightBoxEl.style.display = 'block';
