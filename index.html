@@ -2,12 +2,12 @@
   .locationContainer {
     text-align: center;
     min-height: 240px;
-    max-height: 320px;
+    max-height: 340px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     padding: 30px;
-    box-shadow: 0px 0px 80px rgba(0, 0, 0, 0.6);
+    box-shadow: 0px 0px 300px rgba(0, 0, 0, 0.6);
     position: fixed;
     left: 0;
     right: 0;
@@ -26,30 +26,34 @@
   .locationTitle {
     font-size: 32px;
     line-height: 1.3em;
+    margin-bottom: 5px;
   }
 
   .locationSubtitle {
     font-size: 18px;
   }
 
-  .locationFlags a {
+  .locationFlags a,
+  .closeLocationBox {
     display: inline-block;
     text-align: center;
     padding: 10px;
-    text-decoration: none;
+    text-decoration: none !important;
     outline: none;
     color: #5f5f5e !important;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
   }
 
   .locationFlags img {
     width: 100%;
     max-width: 100px;
-    margin: 10px 10px 20px;
+    margin: 10px;
   }
 
-  .locationFlags div {
-    margin-top: 10px;
-    font-weight: bold;
+  .locationFlags+div {
+    font-size: 15px;
   }
 
   #closeLocationBox {
@@ -66,13 +70,8 @@
     border-radius: 1000px;
   }
 
-  .closeLocationBox {
-    cursor: pointer;
-  }
-
   .locationFlags+div+a {
-    font-size: 16px;
-    padding: 10px;
+    font-size: 15px;
     display: block;
   }
 
@@ -99,7 +98,7 @@
 
     .locationFlags a {
       display: inline-block;
-      max-width: calc(63.333% - 6px);
+      max-width: calc(100% - 6px);
     }
 
     .locationFlags::-webkit-scrollbar {
@@ -138,12 +137,30 @@
         const geoData = await geoRes.json();
         const country = geoData.country;
 
+        const data = {
+          "GB": {
+            "title": "Sorry, we don't ship to your location!",
+            "subtitle": "We do not ship to your location from this site. Please visit our UK site to place an order.",
+            "redirectLink": "https://www.regatta.com",
+            "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/uk.svg",
+            "flagText": "Continue to our Regatta UK Site &gt;",
+            "closeText": "Or continue browsing this site"
+          },
+          "IE": {
+            "title": "Sorry, we don't ship to your location!",
+            "subtitle": "We do not ship to your location from this site. Please visit our Irish site to place an order.",
+            "redirectLink": "https://www.regatta.ie",
+            "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/ireland.svg",
+            "flagText": "Continue to our Regatta Ireland Site &gt;",
+            "closeText": "Or continue browsing this site"
+          }
+        }
 
         if (country === 'IE') {
-          const jsonRes = await fetch('regattaData.json');
-          const allData = await jsonRes.json();
-          const contentData = allData[country];
-          
+          // const jsonRes = await fetch('regattaData.json');
+          // const data = await jsonRes.json();
+          const contentData = data[country];
+
           const contentsHTML = `
             <div class="locationContainer">
               <div id="closeLocationBox" class="closeLocationBox">X</div>
