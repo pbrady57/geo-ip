@@ -127,39 +127,61 @@
 </div>
 
 <script>
-  const sessionStorage = window.sessionStorage;
-  const locationLightboxSeen = sessionStorage.getItem('locationLightboxSeen');
+  (async () => {
+    try {
+      const geoRes = await fetch('https://geo-ip-regatta.herokuapp.com/');
+      const geoData = await geoRes.json();
+      const userCountry = geoData.country;
 
-  if (locationLightboxSeen !== 'true') {
-    (async () => {
-      try {
-        const geoRes = await fetch('https://geo-ip-regatta.herokuapp.com/');
-        const geoData = await geoRes.json();
-        const country = geoData.country;
+      const sessionStorage = window.sessionStorage;
+      const lastUserCountry = sessionStorage.getItem('lastUserCountry');
+      const hasUserCountryChanged = lastUserCountry && lastUserCountry !== userCountry;
+      if (hasUserCountryChanged) sessionStorage.setItem('locationLightboxSeen', 'false');
+      const locationLightboxSeen = sessionStorage.getItem('locationLightboxSeen');
 
+      if (locationLightboxSeen !== 'true' || hasUserCountryChanged) {
+        sessionStorage.setItem('lastUserCountry', userCountry);
         const data = {
           "GB": {
-            "title": "Sorry, we don't ship to your location!",
-            "subtitle": "We do not ship to your location from this site. Please visit our UK site to place an order.",
-            "redirectLink": "https://www.regatta.com",
-            "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/uk.svg",
-            "flagText": "Continue to our Regatta UK Site &gt;",
-            "closeText": "Or continue browsing this site"
+            "content": {
+              "title": "Sorry, we don't ship to your location!",
+              "subtitle": "We do not ship to your location from this site. Please visit our UK site to place an order.",
+              "redirectLink": "https://www.regatta.com",
+              "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/uk.svg",
+              "flagText": "Continue to our Regatta UK Site &gt;",
+              "closeText": "Or continue browsing this site",
+            },
+            "countriesToShow": ['IE', 'FR', 'DE', 'US']
           },
           "IE": {
-            "title": "Sorry, we don't ship to your location!",
-            "subtitle": "We do not ship to your location from this site. Please visit our Irish site to place an order.",
-            "redirectLink": "https://www.regatta.ie",
-            "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/ireland.svg",
-            "flagText": "Continue to our Regatta Ireland Site &gt;",
-            "closeText": "Or continue browsing this site"
+            "content": {
+              "title": "Sorry, we don't ship to your location!",
+              "subtitle": "We do not ship to your location from this site. Please visit our Irish site to place an order.",
+              "redirectLink": "https://www.regatta.ie",
+              "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/ireland.svg",
+              "flagText": "Continue to our Regatta Ireland Site &gt;",
+              "closeText": "Or continue browsing this site"
+            },
+            "countriesToShow": ['GB', 'FR', 'DE', 'US']
+          },
+          "EU": {
+            "content": {
+              "title": "Sorry, we don't ship to your location!",
+              "subtitle": "We do not ship to your location from this site. Please visit our EU site to place an order.",
+              "redirectLink": "https://www.regatta.com/eu/",
+              "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/europe.svg",
+              "flagText": "Continue to our Regatta Europe Site &gt;",
+              "closeText": "Or continue browsing this site"
+            },
           }
         }
 
-        if (country === 'IE') {
+        const siteCountry = 'GB';
+        
+        if (data[siteCountry].countriesToShow.includes(userCountry) || !data[userCountry]) {
           // const jsonRes = await fetch('regattaData.json');
           // const data = await jsonRes.json();
-          const contentData = data[country];
+          const contentData = !data[userCountry] ? data.EU.content : data[userCountry].content;
 
           const contentsHTML = `
             <div class="locationContainer">
@@ -181,7 +203,6 @@
           lightBoxEl.innerHTML = contentsHTML;
           lightBoxEl.style.display = 'block';
 
-          //  Close lightbox on clicking cross or continue browsing site
           const closeElements = document.querySelectorAll('.closeLocationBox');
           [...closeElements].forEach(el => {
             el.addEventListener('click', e => {
@@ -191,9 +212,9 @@
             });
           });
         }
-      } catch (error) {
-        console.error(error);
       }
-    })()
-  }
+    } catch (error) {
+      console.error(error);
+    }
+  })()
 </script>
