@@ -1,8 +1,115 @@
+<script>
+  /* 
+    Country codes:
+    United Kingdom: GB
+    USA: US
+    Ireland: IE
+    Germany: DE
+  */
+
+  const siteName = 'RC';
+  const siteCountry = 'US';
+
+  (async () => {
+    try {
+      const geoRes = await fetch('https://geo-ip-regatta.herokuapp.com/');
+      const geoData = await geoRes.json();
+      const userCountry = geoData.country;
+
+      const sessionStorage = window.sessionStorage;
+      const lastUserCountry = sessionStorage.getItem('lastUserCountry');
+      const hasUserCountryChanged = lastUserCountry && lastUserCountry !== userCountry;
+      if (hasUserCountryChanged) sessionStorage.setItem('locationLightboxSeen', 'false');
+      const locationLightboxSeen = sessionStorage.getItem('locationLightboxSeen');
+      sessionStorage.setItem('lastUserCountry', userCountry);
+
+      if (locationLightboxSeen !== 'true' || hasUserCountryChanged) {
+        if (userCountry !== siteCountry) {
+          const contentData = data[siteName][userCountry] || data[siteName].EU;
+
+          const contentsHTML = `
+            <div class="locationContainer">
+              <div id="closeLocationBox" class="closeLocationBox">X</div>
+              <div class="locationTitle">${contentData.title}</div>
+              <div class="locationSubtitle">${contentData.subtitle}</div>
+              <div class="locationFlags">
+                <a href="${contentData.redirectLink}">
+                  <img src="${contentData.flagSrc}">
+                  <div>${contentData.flagText}</div>
+                </a>
+              </div>
+              <div>Or</div>
+              <a class="closeLocationBox">${contentData.closeText}</a>
+            </div>
+          `
+
+          const lightBoxEl = document.getElementById('locationLightbox');
+          lightBoxEl.innerHTML = contentsHTML;
+          lightBoxEl.style.display = 'block';
+
+          const closeElements = document.querySelectorAll('.closeLocationBox');
+          [...closeElements].forEach(el => {
+            el.addEventListener('click', e => {
+              e.preventDefault();
+              document.getElementById('locationLightbox').style.display = 'none';
+              sessionStorage.setItem('locationLightboxSeen', 'true');
+            });
+          });
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  })();
+
+  const data = {
+    "RC": {
+      "GB": {
+        "title": "Sorry, we don't ship to your location!",
+        "subtitle": "We do not ship to your location from this site. Please visit our UK site to place an order.",
+        "redirectLink": "https://www.regatta.com",
+        "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/uk.svg",
+        "flagText": "Continue to our Regatta UK Site &gt;",
+        "closeText": "Or continue browsing this site &gt;",
+      },
+      "IE": {
+        "title": "Sorry, we don't ship to your location!",
+        "subtitle": "We do not ship to your location from this site. Please visit our Irish site to place an order.",
+        "redirectLink": "https://www.regatta.ie",
+        "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/ireland.svg",
+        "flagText": "Continue to our Regatta Ireland Site &gt;",
+        "closeText": "Or continue browsing this site &gt;"
+      },
+      "US": {
+        "title": "Sorry, we don't ship to your location!",
+        "subtitle": "We do not ship to your location from this site. Please visit our US site to place an order.",
+        "redirectLink": "https://www.regatta.com/us/",
+        "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/us.svg",
+        "flagText": "Continue to our Regatta US Site &gt;",
+        "closeText": "Or continue browsing this site &gt;"
+
+      },
+      "EU": {
+        "title": "Sorry, we don't ship to your location!",
+        "subtitle": "We do not ship to your location from this site. Please visit our EU site to place an order.",
+        "redirectLink": "https://www.regatta.com/eu/",
+        "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/europe.svg",
+        "flagText": "Continue to our Regatta Europe Site &gt;",
+        "closeText": "Or continue browsing this site &gt;"
+      },
+    },
+  };
+</script>
+
+<div id="locationLightbox" style="display:none;">
+  &nbsp;
+</div>
+
 <style>
   .locationContainer {
     text-align: center;
     min-height: 240px;
-    max-height: 340px;
+    max-height: 345px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -26,7 +133,7 @@
   .locationTitle {
     font-size: 32px;
     line-height: 1.3em;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
   }
 
   .locationSubtitle {
@@ -44,6 +151,7 @@
     cursor: pointer;
     font-weight: bold;
     font-size: 15px;
+    margin:0 !important;
   }
 
   .locationFlags img {
@@ -121,116 +229,3 @@
     }
   }
 </style>
-
-<div id="locationLightbox" style="display:none;">
-  &nbsp;
-</div>
-
-<script>
-  const siteName = 'RC';
-  const siteCountry = 'GB';
-  
-  (async () => {
-    try {
-      const geoRes = await fetch('https://geo-ip-regatta.herokuapp.com/');
-      const geoData = await geoRes.json();
-      const userCountry = geoData.country;
-
-      const sessionStorage = window.sessionStorage;
-      const lastUserCountry = sessionStorage.getItem('lastUserCountry');
-      const hasUserCountryChanged = lastUserCountry && lastUserCountry !== userCountry;
-      if (hasUserCountryChanged) sessionStorage.setItem('locationLightboxSeen', 'false');
-      const locationLightboxSeen = sessionStorage.getItem('locationLightboxSeen');
-      sessionStorage.setItem('lastUserCountry', userCountry);
-
-      if (locationLightboxSeen !== 'true' || hasUserCountryChanged) {
-        if (data[siteName][siteCountry].countriesToShow.includes(userCountry) || !data[siteName][userCountry]) {
-          const contentData = !data[siteName][userCountry] ? data[siteName].EU.content : data[siteName][userCountry].content;
-
-          const contentsHTML = `
-            <div class="locationContainer">
-              <div id="closeLocationBox" class="closeLocationBox">X</div>
-              <div class="locationTitle">${contentData.title}</div>
-              <div class="locationSubtitle">${contentData.subtitle}</div>
-              <div class="locationFlags">
-                <a href="${contentData.redirectLink}">
-                  <img src="${contentData.flagSrc}">
-                  <div>${contentData.flagText}</div>
-                </a>
-              </div>
-              <div>Or</div>
-              <a class="closeLocationBox">${contentData.closeText}</a>
-            </div>
-          `
-
-          const lightBoxEl = document.getElementById('locationLightbox');
-          lightBoxEl.innerHTML = contentsHTML;
-          lightBoxEl.style.display = 'block';
-
-          const closeElements = document.querySelectorAll('.closeLocationBox');
-          [...closeElements].forEach(el => {
-            el.addEventListener('click', e => {
-              e.preventDefault();
-              document.getElementById('locationLightbox').style.display = 'none';
-              sessionStorage.setItem('locationLightboxSeen', 'true');
-            });
-          });
-        }
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  })();
-
-  const data = {
-    "RC": {
-      "GB": {
-        "content": {
-          "title": "Sorry, we don't ship to your location!",
-          "subtitle": "We do not ship to your location from this site. Please visit our UK site to place an order.",
-          "redirectLink": "https://www.regatta.com",
-          "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/uk.svg",
-          "flagText": "Continue to our Regatta UK Site &gt;",
-          "closeText": "Or continue browsing this site",
-        },
-        "countriesToShow": ['IE', 'FR', 'DE', 'US']
-      },
-      "IE": {
-        "content": {
-          "title": "Sorry, we don't ship to your location!",
-          "subtitle": "We do not ship to your location from this site. Please visit our Irish site to place an order.",
-          "redirectLink": "https://www.regatta.ie",
-          "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/ireland.svg",
-          "flagText": "Continue to our Regatta Ireland Site &gt;",
-          "closeText": "Or continue browsing this site"
-        },
-        "countriesToShow": ['GB', 'FR', 'DE', 'US']
-      },
-      "EU": {
-        "content": {
-          "title": "Sorry, we don't ship to your location!",
-          "subtitle": "We do not ship to your location from this site. Please visit our EU site to place an order.",
-          "redirectLink": "https://www.regatta.com/eu/",
-          "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/europe.svg",
-          "flagText": "Continue to our Regatta Europe Site &gt;",
-          "closeText": "Or continue browsing this site"
-        },
-      },
-    },
-    "D2B":{
-      "GB": {
-        "content": {
-          "title": "Sorry, we don't ship to your location!",
-          "subtitle": "We do not ship to your location from this site. Please visit our UK site to place an order.",
-          "redirectLink": "https://www.dare2b.com",
-          "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/uk.svg",
-          "flagText": "Continue to our Dare2B UK Site &gt;",
-          "closeText": "Or continue browsing this site",
-        },
-        "countriesToShow": ['IE', 'FR', 'DE', 'US']
-      },
-    },
-    "OSO":{},
-    "TT":{},
-  };
-</script>
