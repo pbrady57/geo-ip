@@ -12,7 +12,7 @@
 
   (async () => {
     try {
-      const geoRes = await fetch('https://geo-ip-regatta.herokuapp.com/');
+      const geoRes = await fetch('https://geo-validate.regatta.com/');
       const geoData = await geoRes.json();
       const userCountry = geoData.country;
 
@@ -30,7 +30,7 @@
           const contentsHTML = `
             <div class="locationContainer">
               <div id="closeLocationBox" class="closeLocationBox">X</div>
-              <div class="locationTitle">${contentData.title}</div>
+              <div class="locationTitle">${contentData.title || "Sorry, we don't ship to your location!"}</div>
               <div class="locationSubtitle">${contentData.subtitle}</div>
               <div class="locationFlags">
                 <a href="${contentData.redirectLink}">
@@ -39,7 +39,7 @@
                 </a>
               </div>
               <div>Or</div>
-              <a class="closeLocationBox">${contentData.closeText}</a>
+              <a class="closeLocationBox">${contentData.closeText || "Or continue browsing this site &gt;"}</a>
             </div>
           `
 
@@ -65,37 +65,94 @@
   const data = {
     "RC": {
       "GB": {
-        "title": "Sorry, we don't ship to your location!",
         "subtitle": "We do not ship to your location from this site. Please visit our UK site to place an order.",
-        "redirectLink": "https://www.regatta.com",
+        "redirectLink": "https://www.regatta.com/",
         "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/uk.svg",
         "flagText": "Continue to our Regatta UK Site &gt;",
-        "closeText": "Or continue browsing this site &gt;",
       },
       "IE": {
-        "title": "Sorry, we don't ship to your location!",
         "subtitle": "We do not ship to your location from this site. Please visit our Irish site to place an order.",
-        "redirectLink": "https://www.regatta.ie",
+        "redirectLink": "https://www.regatta.ie/",
         "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/ireland.svg",
         "flagText": "Continue to our Regatta Ireland Site &gt;",
-        "closeText": "Or continue browsing this site &gt;"
       },
       "US": {
-        "title": "Sorry, we don't ship to your location!",
         "subtitle": "We do not ship to your location from this site. Please visit our US site to place an order.",
         "redirectLink": "https://www.regatta.com/us/",
         "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/us.svg",
         "flagText": "Continue to our Regatta US Site &gt;",
-        "closeText": "Or continue browsing this site &gt;"
-
+      },
+      "FR": {
+        "title": "",
+        "subtitle": "",
+        "redirectLink": "https://www.regatta.com/fr/",
+        "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/france.svg",
+        "flagText": "",
+        "closeText": "",
+      },
+      "DE": {
+        "title": "",
+        "subtitle": "",
+        "redirectLink": "https://www.regatta.com/de/",
+        "flagSrc": "",
+        "flagText": "",
+        "closeText": "",
+      },
+      "PL": {
+        "title": "",
+        "subtitle": "",
+        "redirectLink": "https://www.regatta.pl/",
+        "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/poland.svg",
+        "flagText": "",
+        "closeText": "",
+      },
+      "US": {
+        "subtitle": "We do not ship to your location from this site. Please visit our US site to place an order.",
+        "redirectLink": "https://www.regatta.com/us/",
+        "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/us.svg",
+        "flagText": "Continue to our Regatta US Site &gt;",
       },
       "EU": {
-        "title": "Sorry, we don't ship to your location!",
         "subtitle": "We do not ship to your location from this site. Please visit our EU site to place an order.",
         "redirectLink": "https://www.regatta.com/eu/",
         "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/europe.svg",
         "flagText": "Continue to our Regatta Europe Site &gt;",
-        "closeText": "Or continue browsing this site &gt;"
+      },
+    },
+    "D2B": {
+      "GB": {
+        "subtitle": "We do not ship to your location from this site. Please visit our UK site to place an order.",
+        "redirectLink": "https://www.dare2b.com/",
+        "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/uk.svg",
+        "flagText": "Continue to our Dare2B UK Site &gt;",
+      },
+      "IE": {
+        "subtitle": "We do not ship to your location from this site. Please visit our UK site to place an order.",
+        "redirectLink": "https://www.dare2b.ie/",
+        "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/uk.svg",
+        "flagText": "Continue to our Dare2B Ireland Site &gt;",
+      },
+      "FR": {
+        "title": "",
+        "subtitle": "",
+        "redirectLink": "https://www.dare2b.fr/",
+        "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/france.svg",
+        "flagText": "",
+        "closeText": "",
+      },
+      "DE": {
+        "title": "",
+        "subtitle": "",
+        "redirectLink": "https://www.dare2b.com/de/",
+        "flagSrc": "",
+        "flagText": "",
+        "closeText": "",
+      },
+      "EU": {
+        "subtitle": "We do not ship to your location from this site. Please visit our EU site to place an order.",
+        "redirectLink": "https://www.dare2b.com/eu/",
+        "flagSrc": "https://global-cdn.regatta.com/assets/icon-pack/flags/europe.svg",
+        "flagText": "Continue to our Dare2B Europe Site &gt;",
       },
     },
   };
@@ -151,7 +208,7 @@
     cursor: pointer;
     font-weight: bold;
     font-size: 15px;
-    margin:0 !important;
+    margin: 0 !important;
   }
 
   .locationFlags img {
